@@ -30,15 +30,10 @@ jobs:
         # заливаем файлы при помощи rsync
         run: |
           rsync -a --progress --human-readable --delete \
-          # исключить все, что есть в .gitignore
           --exclude-from '.gitignore' \
-          # не загружаем .gitignore
           --exclude .gitignore \
-          # не загружаем .git
           --exclude .git \
-          # Не удаляем директорию с нашим фронтендом
-          --exclude public \
-          . deploy@134.209.92.1:~/realworld/
+          --exclude public
       # job для перезапуска приложения при помощи pm2
       - name: Restart the application
         run: |
