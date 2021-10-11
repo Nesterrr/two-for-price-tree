@@ -29,15 +29,7 @@ jobs:
       - name: Copy files to the server
         # заливаем файлы при помощи rsync
         run: |
-          rsync -a --progress --human-readable --delete \
-          # исключить все, что есть в .gitignore
-          --exclude-from '.gitignore' \
-          # не загружаем .gitignore
-          --exclude .gitignore \
-          # не загружаем .git
-          --exclude .git \
-          # Не удаляем директорию с нашим фронтендом
-          --exclude public \
+          rsync -a --progress --human-readable \
           . deploy@134.209.92.1:~/
       # job для перезапуска приложения при помощи pm2
       - name: Restart the application
