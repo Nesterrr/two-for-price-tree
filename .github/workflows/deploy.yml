@@ -38,7 +38,7 @@ jobs:
           --exclude .git \
           # Не удаляем директорию с нашим фронтендом
           --exclude public \
-          . deploy@134.209.92.1:~/www/
+          . deploy@134.209.92.1:~/
       # job для перезапуска приложения при помощи pm2
       # - name: Restart the application
       #   run: |
