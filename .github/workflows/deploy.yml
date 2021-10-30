@@ -31,7 +31,7 @@ jobs:
         run: |
           rsync -a --progress --human-readable --delete \
           # исключить все, что есть в .gitignore
-          --exclude-from '.gitignore' \
+          --exclude '.gitignore' \
           # не загружаем .gitignore
           --exclude .gitignore \
           # не загружаем .git
