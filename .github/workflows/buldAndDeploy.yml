@@ -1,17 +1,39 @@
-name: Deploy
+name: Build and Deploy
 
 on:
   push:
-    branches: [master]
+    branches: [main]
 
   # специальное событие, которое происходит при ручном вызове workflow
   workflow_dispatch:
 
 jobs:
-  deploy:
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
+      # указываем action, который будет запущен как часть job
+      # В текущем случае это клонирование репозитория
       - uses: actions/checkout@v2
+      # Кеширование npm
+      - name: Cache dependencies
+        # включаем специальный action
+        uses: actions/cache@v2
+        # передаем параметры
+        with:
+          # что кешировать (путь)
+          path: ~/.npm
+          # ключ кеширования (хеш)
+          key: npm-${{ hashFiles('package-lock.json') }}
+          # ключ для восстановления кеша
+          restore-keys: npm-
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+      # Запуск сборки
+      - name: Build
+        run: npm run build
+        # env:
+        #   REACT_APP_BACKEND_URL: ${{ secrets.API_URL }}
+      # Дальше по аналогии с backend, просто загружаем на сервер
       - name: Setup SSH
         run: |
           # создаем директорию для ключа
@@ -27,7 +49,6 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
       - name: Copy files to the server
-        # заливаем файлы при помощи rsync
         run: |
           rsync -a --progress --human-readable --delete \
           --exclude-from '.gitignore' \
@@ -35,7 +56,3 @@ jobs:
           --exclude .git \
           --exclude public \
           . deploy@134.209.92.1:~/www/
-      # job для перезапуска приложения при помощи pm2
-      # - name: Restart the application
-      #   run: |
-      #     ssh deploy@134.209.92.1 "pushd ~/ && npm install"
